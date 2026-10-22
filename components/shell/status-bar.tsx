@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * Bottom status strip: WebSocket state, events ingested, last AI call, est. cost.
- * Deliberately NOT an aria-live region: it updates every ~1.5s, which would
- * flood screen readers. The values are still readable on demand.
+ * Illustrative shell telemetry. LIVE has no backend, so retained demo values
+ * must never be presented as live measurements. Not aria-live: demo ticks
+ * would otherwise flood screen readers.
  */
 import { Bot, Coins, Database } from "lucide-react";
 import type { ReactNode } from "react";
@@ -44,12 +44,19 @@ export function StatusBar() {
   const { mode } = useShellUI();
   const now = useNow();
   const ws = WS_DISPLAY[t.wsState];
+  const demo = mode === "demo";
 
   return (
     <footer
       aria-label="System status"
       className="data relative z-20 flex h-7 shrink-0 items-center overflow-x-auto border-t border-line bg-sidebar text-[11px] whitespace-nowrap backdrop-blur-xl"
     >
+      <Item>
+        <span className="rounded-sm border border-warn/40 px-1.5 font-heading text-[9px] font-semibold tracking-[0.16em] text-warn">
+          {demo ? "DEMO DATA" : "LIVE UNAVAILABLE"}
+        </span>
+      </Item>
+
       <Item>
         <span className={cn("size-1.5 rounded-full", ws.dot, ws.pulse && "animate-pulse-dot")} />
         <Label>WS</Label>
@@ -58,14 +65,16 @@ export function StatusBar() {
 
       <Item>
         <Database className="size-3 text-ink-dim" aria-hidden />
-        <Label>EVENTS</Label>
-        <span className="text-ink">{t.eventsIngested.toLocaleString("en-US")}</span>
+        <Label>{demo ? "SIMULATED EVENTS" : "EVENTS"}</Label>
+        <span className="text-ink">{demo ? t.eventsIngested.toLocaleString("en-US") : "Unavailable"}</span>
       </Item>
 
       <Item>
         <Bot className="size-3 text-ink-dim" aria-hidden />
-        <Label>LAST AI CALL</Label>
-        {t.lastAiCallAt !== null && now !== null ? (
+        <Label>{demo ? "SIMULATED AI CALL" : "AI CALL"}</Label>
+        {!demo ? (
+          <span className="text-ink-dim">Unavailable</span>
+        ) : t.lastAiCallAt !== null && now !== null ? (
           <span className="text-ink">
             {utcTime(t.lastAiCallAt)} <span className="text-ink-dim">· {ago(now - t.lastAiCallAt)}</span>
           </span>
@@ -76,20 +85,11 @@ export function StatusBar() {
 
       <Item>
         <Coins className="size-3 text-ink-dim" aria-hidden />
-        <Label>EST. API COST</Label>
-        <span className="text-ink">${t.apiCostUsd.toFixed(4)}</span>
+        <Label>{demo ? "SIMULATED COST" : "API COST"}</Label>
+        <span className="text-ink">{demo ? `$${t.apiCostUsd.toFixed(4)}` : "Unavailable"}</span>
       </Item>
 
-      <div className="ml-auto flex items-center">
-        {mode === "demo" && (
-          <Item>
-            <span className="rounded-sm border border-warn/40 px-1.5 font-heading text-[9px] font-semibold tracking-[0.16em] text-warn">
-              MOCK DATA
-            </span>
-          </Item>
-        )}
-        <Item className="text-ink-dim">v0.1.0 · PHASE 1</Item>
-      </div>
+      <Item className="ml-auto text-ink-dim">v0.1.0 · PHASE 1</Item>
     </footer>
   );
 }

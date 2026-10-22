@@ -1,0 +1,14 @@
+[
+  {
+    "viewport": "desktop",
+    "demo_label_present": false,
+    "live_metrics_unavailable": false,
+    "no_backend_preserved": true
+  },
+  {
+    "viewport": "phone",
+    "demo_label_present": false,
+    "live_metrics_unavailable": false,
+    "no_backend_preserved": true
+  }
+]
