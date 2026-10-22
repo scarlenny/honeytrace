@@ -1,0 +1,28 @@
+[
+  {
+    "test": "desktop DEMO labels and no page overflow",
+    "passed": true
+  },
+  {
+    "test": "desktop LIVE hides demo metrics, preserves no-backend state, no page overflow",
+    "passed": true,
+    "errors": []
+  },
+  {
+    "test": "desktop DEMO restored after mode switch",
+    "passed": true
+  },
+  {
+    "test": "phone DEMO labels and no page overflow",
+    "passed": true
+  },
+  {
+    "test": "phone LIVE hides demo metrics, preserves no-backend state, no page overflow",
+    "passed": true,
+    "errors": []
+  },
+  {
+    "test": "phone DEMO restored after mode switch",
+    "passed": true
+  }
+]

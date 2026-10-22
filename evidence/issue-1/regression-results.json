@@ -1,0 +1,56 @@
+[
+  {
+    "test": "desktop: all category counts",
+    "passed": true,
+    "counts": {
+      "all": 47,
+      "logins": 24,
+      "commands": 11,
+      "downloads": 1,
+      "connections": 11
+    }
+  },
+  {
+    "test": "desktop: case-insensitive search",
+    "passed": true
+  },
+  {
+    "test": "desktop: row navigation; LIVE preserves mock session and inert URLs",
+    "passed": true
+  },
+  {
+    "test": "desktop: brute-force truncation and scanner timeline",
+    "passed": true
+  },
+  {
+    "test": "desktop: no captured runtime/console errors; no page overflow",
+    "passed": true
+  },
+  {
+    "test": "phone: all category counts",
+    "passed": true,
+    "counts": {
+      "all": 47,
+      "logins": 24,
+      "commands": 11,
+      "downloads": 1,
+      "connections": 11
+    }
+  },
+  {
+    "test": "phone: case-insensitive search",
+    "passed": true
+  },
+  {
+    "test": "phone: row navigation; LIVE preserves mock session and inert URLs",
+    "passed": true
+  },
+  {
+    "test": "phone: brute-force truncation and scanner timeline",
+    "passed": true
+  },
+  {
+    "test": "phone: no captured runtime/console errors; no page overflow",
+    "passed": true
+  }
+]

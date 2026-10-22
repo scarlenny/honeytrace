@@ -6,18 +6,28 @@
  */
 import { cn } from "@/lib/utils";
 import { threatBand } from "@/lib/threat";
-import { useTelemetry } from "./shell-context";
+import { useShellUI, useTelemetry } from "./shell-context";
 
 const ARC = "M4 22 A18 18 0 0 1 40 22"; // semicircle, radius 18, inside a 44x26 box
 
 export function ThreatGauge() {
   const { threatLevel } = useTelemetry();
+  const { mode } = useShellUI();
   const band = threatBand(threatLevel);
+
+  if (mode === "live") {
+    return (
+      <div className="leading-none" aria-label="Threat level unavailable: no live backend">
+        <div className="micro-label text-[9px]">Threat</div>
+        <div className="mt-1 text-sm text-ink-dim">Unavailable</div>
+      </div>
+    );
+  }
 
   return (
     <div
       role="meter"
-      aria-label="Threat level"
+      aria-label="Simulated threat level — demo data"
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={threatLevel}
@@ -51,7 +61,7 @@ export function ThreatGauge() {
         />
       </svg>
       <div className="leading-none">
-        <div className="micro-label text-[9px]">Threat</div>
+        <div className="micro-label text-[9px]">Simulated threat</div>
         <div className="mt-1 flex items-baseline gap-1.5">
           <span className={cn("data text-base font-semibold", band.text)}>{threatLevel}</span>
           <span

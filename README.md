@@ -86,8 +86,8 @@ Unknown session IDs return HTTP 404. Case variants of known IDs are rejected wit
 
 - Dashboard, ATT&CK Matrix, and Intel Report are placeholder views. The component reference page is at `/styleguide`.
 - No live Cowrie ingestion, backend sensor connection, LLM API calls, AI classifications, or live ATT&CK mapping exist.
-- DEMO mode simulates shell telemetry, including event counts, threat score, sensor uptime, AI-call timestamps, and API cost. These are illustrative values, not actual measurements, calls, or charges.
-- LIVE mode reports that no backend is available; it does not connect to a real sensor.
+- DEMO mode simulates shell telemetry, including event counts, threat score, sensor uptime, AI-call timestamps, and API cost. A visible **DEMO DATA** notice and simulated metric labels identify these as illustrative values; no actual AI calls or charges occur.
+- LIVE mode displays **Unavailable** instead of retained demo metrics and reports **OFFLINE · NO BACKEND**. Feed and Session Detail still use the clearly labeled mock dataset; LIVE does not connect to a real sensor.
 - Global top-bar search is UI-only. The Attack Feed's own search is functional.
 - Feed filter choices are not stored in the URL and reset on reload.
 - AI-assisted implementations require review; no production-security or independent security-audit guarantee is made.

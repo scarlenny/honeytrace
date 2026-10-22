@@ -1,0 +1,6 @@
+test_initial_shell_clearly_labels_demo_metrics (__main__.DemoLabelTests.test_initial_shell_clearly_labels_demo_metrics) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.042s
+
+OK
