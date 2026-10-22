@@ -1,0 +1,31 @@
+Base URL: http://127.0.0.1:3001   (connect timeout 3s, max 10s per request)
+
+Known mock sessions -> 200
+ok    200   0.004s  /sessions/c0a8e1f2b3d4                               known session
+ok    200   0.003s  /sessions/7f3b9d21a6e0                               known session
+ok    200   0.002s  /sessions/e41d0c7a95b8                               known session
+
+Unknown IDs -> real 404
+ok    404   0.002s  /sessions/000000000000                               unknown id
+ok    404   0.002s  /sessions/does-not-exist                             unknown id
+ok    404   0.001s  /sessions/C0A8E1F2B3D4                               wrong case of a known id
+ok    404   0.001s  /sessions/7F3B9D21A6E0                               wrong case of a known id
+ok    404   0.001s  /sessions/E41D0C7A95B8                               wrong case of a known id
+ok    404   0.002s  /sessions/c0A8e1F2b3D4                               mixed case of a known id
+ok    404   0.002s  /sessions/c0a8e1f2b3d4%20                            known id + trailing space
+ok    404   0.002s  /sessions/%3Cscript%3Ealert(1)%3C%2Fscript%3E        markup in id
+ok    404   0.002s  /sessions/not-found                                  former rewrite target, visited directly
+ok    404   0.002s  /sessions/000000000000                               repeat request (cached result stays 404)
+
+Malformed percent-encoding -> rejected with 400 or 404, never 5xx
+ok    400   0.002s  /sessions/%E0%A4%A                                   truncated UTF-8 sequence
+ok    400   0.002s  /sessions/%ZZ                                        invalid escape
+ok    400   0.001s  /sessions/%                                          bare percent sign
+
+Known sessions again, after the bad requests -> still 200 with their own content
+(guards against a case variant overwriting a cached page on case-insensitive disks)
+ok    200   0.003s  /sessions/c0a8e1f2b3d4                               known session
+ok    200   0.002s  /sessions/7f3b9d21a6e0                               known session
+ok    200   0.003s  /sessions/e41d0c7a95b8                               known session
+
+Result: 19 passed, 0 failed

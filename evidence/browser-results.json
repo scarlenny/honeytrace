@@ -1,0 +1,50 @@
+[
+  {
+    "id": "T1",
+    "test": "Open Attack Feed",
+    "expected": "47 of 47 events and simulation notice",
+    "actual": "Showing 47 of 47 events; SIMULATED DATA visible",
+    "passed": true,
+    "evidence": "test-01-feed.png"
+  },
+  {
+    "id": "T2",
+    "test": "Commands filter",
+    "expected": "11 of 47 events",
+    "actual": "Showing 11 of 47 events",
+    "passed": true,
+    "evidence": "test-02-commands.png"
+  },
+  {
+    "id": "T3",
+    "test": "Search uname -a",
+    "expected": "One matching command event",
+    "actual": "Showing 1 of 47 events; one table row containing uname -a",
+    "passed": true,
+    "evidence": "test-03-search.png"
+  },
+  {
+    "id": "T4",
+    "test": "Open session from filtered feed row",
+    "expected": "Matching session detail with timeline",
+    "actual": "Navigated to /sessions/c0a8e1f2b3d4; details and timeline rendered",
+    "passed": true,
+    "evidence": "test-04-session-link.png"
+  },
+  {
+    "id": "T5",
+    "test": "Unknown session ID",
+    "expected": "Signal lost page and HTTP 404",
+    "actual": "Signal lost page rendered; HTTP status checked in route suite",
+    "passed": true,
+    "evidence": "test-05-unknown-session.png"
+  },
+  {
+    "id": "T6",
+    "test": "Truncated brute-force session",
+    "expected": "24 of 214 events; 190 omitted",
+    "actual": "Partial timeline notice visible; 24 raw-event disclosures; 214 recorded and 190 omitted",
+    "passed": true,
+    "evidence": "test-06-truncated.png"
+  }
+]

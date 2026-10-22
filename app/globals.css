@@ -1,130 +1,352 @@
+/* ==========================================================================
+   HoneyTrace design system
+   --------------------------------------------------------------------------
+   Layer 1  Raw palette (--ht-*)          : the hex values from the brief.
+   Layer 2  Tailwind tokens (@theme)       : what you type in class names,
+                                            e.g. bg-canvas, text-cyan, border-line.
+   Layer 3  shadcn semantic variables      : mapped onto the palette so any
+                                            shadcn component inherits the look.
+   Layer 4  Custom utilities (@utility)    : glass, glow, micro-label, data.
+   The app is dark-only by design, so there is no light theme block.
+   ========================================================================== */
+
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
 
+/* -------------------------------------------------------------------------
+   Layer 1: raw palette
+   ------------------------------------------------------------------------- */
+:root {
+  /* Surfaces */
+  --ht-base: #070b14;               /* page background */
+  --ht-surface: rgb(14 21 36 / 0.6); /* #0E1524 at 60%, used with backdrop blur */
+  --ht-surface-solid: #0e1524;      /* same color, opaque, for popovers/menus */
+  --ht-line: #1a2436;               /* default 1px borders */
+
+  /* Signal colors */
+  --ht-cyan: #00f0ff;    /* primary accent, focus, links, "normal" activity */
+  --ht-alert: #ff2e63;   /* critical, malicious, high severity */
+  --ht-warn: #ffb800;    /* suspicious, medium severity */
+  --ht-ok: #39ff14;      /* healthy, connected, benign */
+
+  /* Text */
+  --ht-ink: #e6f1ff;       /* primary text */
+  --ht-ink-dim: #7a8ca6;   /* secondary text, labels */
+  --ht-ink-muted: #3d4a5c; /* disabled, gridlines, decoration only (low contrast) */
+
+  /* Map shadcn's semantic variables onto the palette */
+  --background: var(--ht-base);
+  --foreground: var(--ht-ink);
+  --card: var(--ht-surface);
+  --card-foreground: var(--ht-ink);
+  --popover: var(--ht-surface-solid);
+  --popover-foreground: var(--ht-ink);
+  --primary: var(--ht-cyan);
+  --primary-foreground: var(--ht-base);
+  --secondary: #121b2d;
+  --secondary-foreground: var(--ht-ink);
+  --muted: #121b2d;
+  --muted-foreground: var(--ht-ink-dim);
+  --accent: rgb(0 240 255 / 0.08);
+  --accent-foreground: var(--ht-cyan);
+  --destructive: var(--ht-alert);
+  --border: var(--ht-line);
+  --input: var(--ht-line);
+  --ring: var(--ht-cyan);
+  --radius: 0.5rem;
+
+  /* Chart series order: cyan, alert, warn, ok, then a cool violet */
+  --chart-1: var(--ht-cyan);
+  --chart-2: var(--ht-alert);
+  --chart-3: var(--ht-warn);
+  --chart-4: var(--ht-ok);
+  --chart-5: #9d7bff;
+
+  --sidebar: rgb(10 15 26 / 0.75);
+  --sidebar-foreground: var(--ht-ink-dim);
+  --sidebar-primary: var(--ht-cyan);
+  --sidebar-primary-foreground: var(--ht-base);
+  --sidebar-accent: rgb(0 240 255 / 0.08);
+  --sidebar-accent-foreground: var(--ht-cyan);
+  --sidebar-border: var(--ht-line);
+  --sidebar-ring: var(--ht-cyan);
+}
+
+/* -------------------------------------------------------------------------
+   Layer 2: Tailwind tokens
+   Each --color-X becomes bg-X / text-X / border-X / ring-X, etc.
+   Opacity modifiers work too: bg-cyan/10, border-alert/40.
+   ------------------------------------------------------------------------- */
 @theme inline {
+  /* HoneyTrace palette */
+  --color-canvas: var(--ht-base); /* named "canvas", not "base": text-base is Tailwind's font size */
+  --color-surface: var(--ht-surface);
+  --color-surface-solid: var(--ht-surface-solid);
+  --color-line: var(--ht-line);
+  --color-cyan: var(--ht-cyan);
+  --color-alert: var(--ht-alert);
+  --color-warn: var(--ht-warn);
+  --color-ok: var(--ht-ok);
+  --color-ink: var(--ht-ink);
+  --color-ink-dim: var(--ht-ink-dim);
+  --color-ink-muted: var(--ht-ink-muted);
+
+  /* Fonts (variables are injected by next/font in app/layout.tsx)
+     font-sans    = Inter, body UI text
+     font-heading = Space Grotesk, headings, nav, logo
+     font-mono    = JetBrains Mono, ALL data: IPs, hashes, commands, timestamps */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-space-grotesk), var(--font-inter), ui-sans-serif, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, "SFMono-Regular", monospace;
+
+  /* Neon glows: shadow-glow-cyan, shadow-glow-alert, ... */
+  --shadow-glow-cyan: 0 0 0 1px rgb(0 240 255 / 0.35), 0 0 18px -2px rgb(0 240 255 / 0.45);
+  --shadow-glow-alert: 0 0 0 1px rgb(255 46 99 / 0.4), 0 0 18px -2px rgb(255 46 99 / 0.5);
+  --shadow-glow-warn: 0 0 0 1px rgb(255 184 0 / 0.35), 0 0 18px -2px rgb(255 184 0 / 0.45);
+  --shadow-glow-ok: 0 0 0 1px rgb(57 255 20 / 0.35), 0 0 18px -2px rgb(57 255 20 / 0.4);
+  --shadow-panel: 0 8px 32px -12px rgb(0 0 0 / 0.6), inset 0 1px 0 rgb(230 241 255 / 0.03);
+
+  /* Motion tokens used by the app shell.
+     The two grid layers drift by exactly one cell per loop, so the loop is
+     seamless. The coarse layer moves ~2x faster, which reads as parallax depth.
+     Transforms (not background-position) keep this on the GPU. */
+  --animate-drift-fine: drift-fine 40s linear infinite;    /* 32px cell  -> 0.8 px/s */
+  --animate-drift-coarse: drift-coarse 80s linear infinite; /* 128px cell -> 1.6 px/s */
+  --animate-pulse-dot: pulse-dot 2s ease-in-out infinite;
+  --animate-scan: scan 9s linear infinite;
+
+  /* Loading-skeleton sweep, used by placeholder blocks */
+  --animate-shimmer: shimmer 2.4s ease-in-out infinite;
+  @keyframes shimmer {
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(100%); }
+  }
+
+  @keyframes drift-fine {
+    from { transform: translate3d(0, 0, 0); }
+    to   { transform: translate3d(32px, 32px, 0); }
+  }
+  @keyframes drift-coarse {
+    from { transform: translate3d(0, 0, 0); }
+    to   { transform: translate3d(128px, 128px, 0); }
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.45; transform: scale(0.85); }
+  }
+  @keyframes scan {
+    from { transform: translateY(-100%); }
+    to   { transform: translateY(100vh); }
+  }
+
+  /* shadcn semantic tokens (keep these so shadcn components keep working) */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) * 1.4);
   --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-:root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+/* -------------------------------------------------------------------------
+   Layer 4: custom utilities
+   ------------------------------------------------------------------------- */
+
+/* Glassmorphic panel surface. Pair with rounded-* and padding as needed. */
+@utility glass {
+  background-color: var(--ht-surface);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid var(--ht-line);
+  box-shadow: var(--shadow-panel);
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+/* Border that lights up cyan on hover or keyboard focus within. */
+@utility glow-hover {
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+  &:hover,
+  &:focus-within {
+    border-color: rgb(0 240 255 / 0.45);
+    box-shadow: var(--shadow-panel), 0 0 16px -4px rgb(0 240 255 / 0.4);
+  }
 }
 
+/* Uppercase micro-label: panel titles, metric labels, column headers. */
+@utility micro-label {
+  font-family: var(--font-heading);
+  font-size: 0.6875rem; /* 11px */
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ht-ink-dim);
+}
+
+/* Data text: monospace with fixed-width digits so columns line up. */
+@utility data {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums slashed-zero;
+  font-feature-settings: "zero" 1;
+}
+
+/* Soft neon text glow for the logo and big numbers. */
+@utility text-glow-cyan {
+  text-shadow: 0 0 12px rgb(0 240 255 / 0.55), 0 0 2px rgb(0 240 255 / 0.8);
+}
+@utility text-glow-alert {
+  text-shadow: 0 0 12px rgb(255 46 99 / 0.55), 0 0 2px rgb(255 46 99 / 0.8);
+}
+
+/* -------------------------------------------------------------------------
+   <Panel> component styles (components/ui/panel.tsx)
+   Driven by data attributes so the TSX stays readable:
+     data-tone  = default | cyan | alert | warn | ok   (accent color)
+     data-glow  = hover | always | none                (when the border glows)
+   Each tone just sets --panel-rgb; every rule below reads that one variable.
+   Lives in @layer components, so Tailwind classes passed via className win.
+   ------------------------------------------------------------------------- */
+@layer components {
+  .ht-panel {
+    --panel-rgb: 0 240 255; /* default accent = cyan */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    border-radius: calc(var(--radius) * 1.4);
+    border: 1px solid var(--ht-line);
+    background-color: var(--ht-surface);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    box-shadow: var(--shadow-panel);
+    transition: border-color 200ms ease, box-shadow 200ms ease;
+  }
+  .ht-panel[data-tone="alert"] { --panel-rgb: 255 46 99; }
+  .ht-panel[data-tone="warn"]  { --panel-rgb: 255 184 0; }
+  .ht-panel[data-tone="ok"]    { --panel-rgb: 57 255 20; }
+
+  /* Toned panels carry a tinted border even at rest */
+  .ht-panel:not([data-tone="default"]) {
+    border-color: rgb(var(--panel-rgb) / 0.28);
+  }
+
+  /* Glow states */
+  .ht-panel[data-glow="always"] {
+    border-color: rgb(var(--panel-rgb) / 0.45);
+    box-shadow: var(--shadow-panel), 0 0 24px -6px rgb(var(--panel-rgb) / 0.45);
+  }
+  .ht-panel[data-glow="hover"]:hover,
+  .ht-panel[data-glow="hover"]:focus-within {
+    border-color: rgb(var(--panel-rgb) / 0.5);
+    box-shadow: var(--shadow-panel), 0 0 20px -6px rgb(var(--panel-rgb) / 0.45);
+  }
+
+  /* Bright 1px highlight along the top edge, like light catching glass */
+  .ht-panel::before {
+    content: "";
+    position: absolute;
+    inset: -1px 12% auto;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgb(var(--panel-rgb) / 0.55), transparent);
+    opacity: 0.5;
+    transition: opacity 200ms ease;
+    pointer-events: none;
+  }
+  .ht-panel[data-glow="always"]::before,
+  .ht-panel[data-glow="hover"]:hover::before,
+  .ht-panel[data-glow="hover"]:focus-within::before {
+    opacity: 1;
+  }
+
+  /* HUD corner brackets */
+  .ht-panel-corner {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-color: rgb(var(--panel-rgb) / 0.55);
+    pointer-events: none;
+    transition: border-color 200ms ease;
+  }
+  .ht-panel-corner[data-pos="tl"] { top: -1px; left: -1px; border-top-width: 1px; border-left-width: 1px; border-top-left-radius: calc(var(--radius) * 1.4); }
+  .ht-panel-corner[data-pos="tr"] { top: -1px; right: -1px; border-top-width: 1px; border-right-width: 1px; border-top-right-radius: calc(var(--radius) * 1.4); }
+  .ht-panel-corner[data-pos="bl"] { bottom: -1px; left: -1px; border-bottom-width: 1px; border-left-width: 1px; border-bottom-left-radius: calc(var(--radius) * 1.4); }
+  .ht-panel-corner[data-pos="br"] { bottom: -1px; right: -1px; border-bottom-width: 1px; border-right-width: 1px; border-bottom-right-radius: calc(var(--radius) * 1.4); }
+  .ht-panel:hover .ht-panel-corner,
+  .ht-panel[data-glow="always"] .ht-panel-corner {
+    border-color: rgb(var(--panel-rgb) / 0.95);
+  }
+
+  /* Hairline under the header, tinted from the left by the accent */
+  .ht-panel-rule {
+    height: 1px;
+    background: linear-gradient(to right, rgb(var(--panel-rgb) / 0.35), var(--ht-line) 30%, transparent);
+  }
+}
+
+/* -------------------------------------------------------------------------
+   Base styles
+   ------------------------------------------------------------------------- */
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
   html {
     @apply font-sans;
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-canvas text-ink;
+  }
+  h1, h2, h3, h4 {
+    @apply font-heading tracking-tight;
+  }
+  ::selection {
+    background: rgb(0 240 255 / 0.25);
+    color: var(--ht-ink);
+  }
+  /* Thin dark scrollbars to match the SOC look */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--ht-line) transparent;
+  }
+  /* Respect reduced-motion everywhere: kills grid drift, scanlines, transitions */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
